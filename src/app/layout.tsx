@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { Ubuntu } from "next/font/google";
+import { Inter, Ubuntu } from "next/font/google";
 import "./globals.css";
 
-const ubuntu = Ubuntu({ variable: "--font-ubuntu", subsets: ["latin"], weight: ["400", "500", "700"] });
+// sharepal.in uses Inter for text and Ubuntu Bold for display headings.
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
+const ubuntu = Ubuntu({ variable: "--font-ubuntu", subsets: ["latin"], weight: "700" });
 
 export const metadata: Metadata = {
   title: "Gaming Gadgets on Rent | SharePal (recreation)",
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={ubuntu.variable}>
+    <html lang="en" className={`${inter.variable} ${ubuntu.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   );

@@ -14,7 +14,7 @@ export default function CityPicker({ city, isOpen, onClose }: { city: string; is
   }
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} label="Select your city" className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl p-0">
+    <Dialog isOpen={isOpen} onClose={onClose} label="Select your city" className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl bg-white p-0">
       <div className="flex items-center justify-between border-b border-line px-5 py-4">
         <h2 className="text-base font-bold text-navy">Select your city</h2>
         <button onClick={onClose} className="rounded p-1 text-muted hover:text-ink" aria-label="Close">

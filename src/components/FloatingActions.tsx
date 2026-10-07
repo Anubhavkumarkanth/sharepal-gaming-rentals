@@ -1,7 +1,8 @@
 "use client";
 
-import { CalendarCheck2, MessageCircle } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { asset } from "@/lib/asset";
 import { sharepalUrl } from "@/config/site";
 
 // Bottom-of-screen controls from sharepal.in: a reminder to pick dates (until
@@ -14,18 +15,15 @@ export default function FloatingActions() {
       {!dates && (
         <button
           onClick={() => setDatePickerOpen(true)}
-          className="fixed bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border-2 border-lime bg-navy px-5 py-3 text-sm font-medium text-white shadow-card sm:text-base"
+          className="fixed bottom-20 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border-2 border-lime bg-navy px-5 py-3 text-sm font-semibold text-white shadow-card transition-transform hover:scale-[1.03] lg:bottom-6 lg:px-6 lg:text-base"
         >
-          <CalendarCheck2 className="h-5 w-5" aria-hidden />
+          <CalendarClock className="h-5 w-5" aria-hidden />
           Select rental dates to see total rent
         </button>
       )}
-      <a
-        href={sharepalUrl("/contact-us")}
-        aria-label="Contact support"
-        className="fixed bottom-5 right-4 z-30 hidden h-14 w-14 place-items-center rounded-full bg-brand text-white shadow-card hover:bg-brand-dark sm:grid lg:right-8"
-      >
-        <MessageCircle className="h-7 w-7" />
+      <a href={sharepalUrl("/support")} aria-label="Contact support" className="fixed bottom-36 right-3 z-30 lg:bottom-6 lg:right-6">
+        {/* eslint-disable-next-line @next/next/no-img-element -- small static SVG */}
+        <img src={asset("/chat.svg")} alt="" width={112} height={112} className="h-16 w-16 lg:h-[72px] lg:w-[72px]" />
       </a>
     </>
   );

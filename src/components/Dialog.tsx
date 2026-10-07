@@ -33,7 +33,7 @@ export default function Dialog({
       onClose={onClose}
       // A click whose target is the <dialog> itself landed on the backdrop.
       onClick={(e) => e.target === ref.current && onClose()}
-      className={`bg-white text-ink backdrop:bg-navy/50 ${className}`}
+      className={`text-ink backdrop:bg-navy/50 ${className}`}
     >
       {isOpen && children}
     </dialog>

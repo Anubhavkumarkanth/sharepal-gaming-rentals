@@ -1,40 +1,32 @@
-import { Smile } from "lucide-react";
-import ProductImage from "@/components/ProductImage";
+/* eslint-disable @next/next/no-img-element -- small category icons from SharePal's CDN */
 import { GROUPS, products } from "@/lib/products";
+import { sharepalImage } from "@/lib/asset";
 
-// Each group's tile shows the first product in that group.
+// "All" uses SharePal's own icon; every other group shows its first product.
 const groups = GROUPS.map((group) => ({
   ...group,
-  image: group.id === "all" ? null : products.find(group.test)?.image,
+  image: group.id === "all" ? sharepalImage("misc/hard-coded/sharepal/Product=All%20Products.webp") : products.find(group.test)?.image,
 }));
 
 export default function Sidebar({ selected, onSelect }: { selected: string; onSelect: (id: string) => void }) {
   return (
-    <nav aria-label="Product types" className="lg:sticky lg:top-32 lg:self-start">
-      <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 lg:mx-0 lg:flex-col lg:gap-4 lg:rounded-2xl lg:bg-white lg:px-4 lg:py-5 lg:shadow-card">
+    <nav aria-label="Product types" className="sticky top-[150px] self-start lg:top-[100px]">
+      <ul className="flex flex-col gap-3 rounded-xl bg-white px-1.5 py-3 lg:gap-5 lg:rounded-2xl lg:px-3 lg:py-3">
         {groups.map((group) => {
           const isSelected = group.id === selected;
           return (
-            <li key={group.id} className="shrink-0">
-              <button
-                onClick={() => onSelect(group.id)}
-                aria-pressed={isSelected}
-                className="flex w-20 flex-col items-center gap-1.5 text-center lg:w-full"
-              >
+            <li key={group.id}>
+              <button onClick={() => onSelect(group.id)} aria-pressed={isSelected} className="group flex w-full flex-col items-center gap-1.5 text-center">
                 <span
-                  className={`grid h-16 w-16 place-items-center overflow-hidden rounded-xl border-2 bg-white lg:h-20 lg:w-20 ${
-                    isSelected ? "border-brand" : "border-line"
+                  className={`grid h-12 w-12 place-items-center overflow-hidden rounded-lg bg-white transition-colors lg:h-16 lg:w-16 lg:rounded-xl ${
+                    isSelected ? "border-2 border-brand" : "border border-line group-hover:border-subtle"
                   }`}
                 >
-                  {group.image ? (
-                    <ProductImage src={group.image} alt="" className="h-full w-full p-1" />
-                  ) : (
-                    <Smile className="h-9 w-9 text-brand" aria-hidden />
-                  )}
+                  {group.image && <img src={group.image} alt="" width={50} height={50} loading="lazy" className="h-[38px] w-[38px] object-contain lg:h-[50px] lg:w-[50px]" />}
                 </span>
                 <span
-                  className={`text-xs font-medium leading-tight lg:text-sm ${
-                    isSelected ? "text-brand underline decoration-2 underline-offset-4" : "text-ink"
+                  className={`text-xs font-semibold leading-tight lg:text-sm ${
+                    isSelected ? "text-brand underline decoration-2 underline-offset-[6px]" : "text-ink"
                   }`}
                 >
                   {group.label}

@@ -5,7 +5,7 @@ import Dialog from "@/components/Dialog";
 import ProductImage from "@/components/ProductImage";
 import { useStore } from "@/lib/store";
 import { products } from "@/lib/products";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatShortDate, formatPrice } from "@/lib/format";
 import { FREE_DELIVERY_ABOVE } from "@/config/site";
 
 export default function CartDrawer() {
@@ -30,7 +30,7 @@ export default function CartDrawer() {
       isOpen={isCartOpen}
       onClose={() => setCartOpen(false)}
       label="Cart"
-      className="my-0 ml-auto mr-0 h-dvh max-h-none w-full max-w-md p-0"
+      className="my-0 ml-auto mr-0 h-dvh max-h-none w-full max-w-md bg-white p-0"
     >
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
@@ -81,7 +81,7 @@ export default function CartDrawer() {
               <div className="flex items-center justify-between">
                 <span className="text-muted">Rental dates</span>
                 <button onClick={() => setDatePickerOpen(true)} className="font-medium text-brand hover:underline">
-                  {dates ? `${formatDate(dates.from)} – ${formatDate(dates.to)}` : "Select dates"}
+                  {dates ? `${formatShortDate(dates.from)} – ${formatShortDate(dates.to)}` : "Select dates"}
                 </button>
               </div>
               <div className="mt-2 flex justify-between text-muted">

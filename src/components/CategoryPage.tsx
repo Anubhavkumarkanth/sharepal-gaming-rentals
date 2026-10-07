@@ -1,8 +1,9 @@
 import Header from "@/components/Header";
 import CategoryNav from "@/components/CategoryNav";
+import { MobileBanner } from "@/components/Banner";
 import ProductSection from "@/components/ProductSection";
-import HowItWorks from "@/components/HowItWorks";
 import Faq from "@/components/Faq";
+import Stats from "@/components/Stats";
 import Footer from "@/components/Footer";
 import DatePicker from "@/components/DatePicker";
 import CartDrawer from "@/components/CartDrawer";
@@ -16,9 +17,10 @@ export default function CategoryPage({ city }: { city: string }) {
       <Header city={city} />
       <CategoryNav city={city} />
       <main>
+        <MobileBanner />
         <ProductSection />
-        <HowItWorks />
-        <Faq />
+        <Faq city={city} />
+        <Stats />
       </main>
       <Footer city={city} />
 

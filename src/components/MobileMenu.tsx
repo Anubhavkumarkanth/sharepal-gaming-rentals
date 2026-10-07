@@ -13,7 +13,7 @@ export default function MobileMenu({ city, isOpen, onClose, onChangeCity }: Prop
       isOpen={isOpen}
       onClose={onClose}
       label="Menu"
-      className="m-0 h-dvh max-h-none w-[300px] max-w-[85vw] p-0"
+      className="m-0 h-dvh max-h-none w-[300px] max-w-[85vw] bg-white p-0"
     >
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <Logo className="h-9 rounded-lg px-3 text-lg" />

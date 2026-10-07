@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { daysBetween } from "@/lib/format";
+import { chargeableDays } from "@/lib/format";
 
 export type RentalDates = { from: Date; to: Date };
 
@@ -11,7 +11,7 @@ type StoreValue = {
   updateQuantity: (id: number, quantity: number) => void;
   dates: RentalDates | null;
   setDates: (dates: RentalDates | null) => void;
-  rentalDays: number | null;
+  rentalDays: number | null; // chargeable days, null until dates are picked
   votes: number[];
   addVote: (id: number) => void;
   notifyList: number[];
@@ -58,8 +58,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setCart(saved.cart);
         setVotes(saved.votes);
         setNotifyList(saved.notifyList);
-        // Drop saved dates that are already in the past.
-        if (saved.dates && new Date(saved.dates.from) > new Date()) {
+        // Drop saved dates whose delivery day has already passed.
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (saved.dates && new Date(saved.dates.from) >= today) {
           setDates({ from: new Date(saved.dates.from), to: new Date(saved.dates.to) });
         }
       }
@@ -122,7 +124,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     updateQuantity,
     dates,
     setDates,
-    rentalDays: dates ? daysBetween(dates.from, dates.to) : null,
+    rentalDays: dates ? chargeableDays(dates.from, dates.to) : null,
     votes,
     addVote,
     notifyList,

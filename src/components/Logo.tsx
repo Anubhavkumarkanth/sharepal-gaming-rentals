@@ -1,4 +1,11 @@
-// Text wordmark in SharePal's blue block, instead of copying their logo file.
-export default function Logo({ className = "h-14 rounded-b-xl px-3 text-xl lg:h-[84px] lg:px-5 lg:text-[32px]" }: { className?: string }) {
-  return <span className={`flex items-center bg-brand font-bold italic tracking-tight text-white ${className}`}>SharePal</span>;
+import { asset } from "@/lib/asset";
+
+// SharePal's logo ("Share" in white, "Pal" in lime) on its blue tab.
+export default function Logo({ className = "" }: { className?: string }) {
+  return (
+    <span className={`flex items-end justify-center bg-brand ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- small static SVG */}
+      <img src={asset("/sharepal-logo.svg")} alt="SharePal" width={137} height={27} className="h-auto w-full" />
+    </span>
+  );
 }
