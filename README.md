@@ -1,7 +1,8 @@
 # SharePal – Gaming Gadgets on Rent
 
-A recreation of SharePal's [Gaming Gadgets on Rent](https://sharepal.in/bangalore/gaming-gadgets-on-rent) page, built
-for a frontend assignment. The product listing is driven by the supplied `product-list.json`.
+Frontend assignment: an end-to-end recreation of SharePal's
+[Gaming Gadgets on Rent](https://sharepal.in/bangalore/gaming-gadgets-on-rent) page (Bangalore), with the product
+listing driven by the supplied `product-list.json`.
 
 **Live demo:** https://anubhavkumarkanth.github.io/sharepal-gaming-rentals/bangalore/gaming-gadgets-on-rent/
 
@@ -49,9 +50,13 @@ Layout, colours, spacing and copy were matched against the live page at 1440px a
   the per-day price straight away and switches to the total once dates are set, so products can be compared immediately.
 - **The date picker doesn't open by itself on page load.** The floating button and the header bar open it instead.
 - **Extra filters and sorting** above the grid, and a short rating / bookings line on each card.
+- **Slightly darker grey and orange text** so small text meets WCAG AA contrast (4.5:1).
+- On laptop widths (1024–1279px) the header uses shorter date labels so nothing wraps.
 - The customer review carousel is left out, as are login and checkout (they show a message).
 
 ## Running locally
+
+Requires Node.js 20.9 or newer.
 
 ```bash
 npm install
@@ -104,6 +109,15 @@ and the Show More count are local state in `ProductSection`, because nothing els
 Modals and drawers use the native `<dialog>` element, which handles focus trapping and closing with Escape. The FAQ uses
 `<details>`/`<summary>`.
 
+## Quality checks
+
+- `npx tsc --noEmit`, `npm run lint` and `npm run build` pass with no errors or warnings.
+- Checked in Chromium at 390, 768, 1024, 1440 and 1917px: no horizontal overflow, no broken images, no console or
+  hydration errors.
+- Interactions checked: search, sidebar groups, filters, sorting, Show More, add to cart, quantity changes, cart totals,
+  date selection and chargeable days, city switching, FAQ and `localStorage` persistence.
+- axe accessibility scan of the page, date picker and cart: no violations.
+
 ## Images
 
 Product photos, banner artwork, category icons and promo banners load from SharePal's image CDN. The large promo and
@@ -116,7 +130,8 @@ The site is a static export (`output: "export"` in `next.config.ts`).
 
 - **GitHub Pages:** `.github/workflows/deploy.yml` lints and builds the site on every push to `main` and publishes `out/`
   to the `gh-pages` branch. `NEXT_PUBLIC_BASE_PATH` is set to the repository name so links work under `/<repo>/`.
-- **Vercel:** import the repository with the default settings. No base path is needed.
+- The same build can be hosted on any static host (for example Vercel or Netlify) without a base path; only GitHub
+  Pages is used for the live demo.
 
 ## Limitations
 

@@ -32,18 +32,7 @@ export const CATEGORY_TABS = [
   { label: "Entertainment", slug: "entertainment-on-rent" },
 ];
 
-export const ASSET_PARTNER = {
-  href: "https://assets.sharepal.in",
-  earning: [
-    { title: "Monthly Earnings", body: "From rental assets" },
-    { title: "Upto ₹10,000", body: "Instant Wallet credits" },
-  ],
-  rental: [
-    { title: "10% Off", body: "Exclusive discount when you rent" },
-    { title: "Get 10% Cashback", body: "On every order" },
-  ],
-};
-
+export const ASSET_PARTNER_URL = "https://assets.sharepal.in";
 export const RENT_YOUR_GEAR_URL = "https://earnwithus.sharepal.in/";
 
 export const FAQS = [
@@ -185,7 +174,7 @@ export const FOOTER_LINKS = [
       { label: "Sharepal for Creators", href: "/sharepal-for-creators" },
       { label: "Careers", href: "/life-at-sharepal?active=careers" },
       { label: "Sharepal for Brands", href: "/sharepal-for-brands" },
-      { label: "Asset Funding Program", href: "https://assets.sharepal.in", isNew: true },
+      { label: "Asset Funding Program", href: ASSET_PARTNER_URL, isNew: true },
       { label: "Rent Your Gear", href: RENT_YOUR_GEAR_URL, isNew: true },
     ],
   },

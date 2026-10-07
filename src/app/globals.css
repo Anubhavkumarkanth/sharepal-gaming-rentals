@@ -12,11 +12,12 @@
   --color-lime: #9eff00;
   --color-lime-50: #e2ffb3;
   --color-orange: #e86419;
+  --color-orange-dark: #c84f0d; /* small text on white needs 4.5:1 contrast */
   --color-sky: #0079bc;
   --color-ink: #020817;
   --color-body: #383a44;
-  --color-muted: #7a7a7a;
-  --color-subtle: #9c9fa8;
+  --color-muted: #6e6e6e;
+  --color-subtle: #6b6f78;
   --color-line: #e2e7ea;
   --color-page: #f4f6f7;
   --color-danger: #c0392b;

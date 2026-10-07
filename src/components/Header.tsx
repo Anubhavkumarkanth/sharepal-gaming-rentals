@@ -16,7 +16,7 @@ function DesktopDateBar({ city, onCityClick }: { city: string; onCityClick: () =
   const openDates = () => setDatePickerOpen(true);
 
   return (
-    <div className="flex h-10 items-center overflow-hidden rounded-full border-2 border-line bg-white text-sm font-semibold text-navy">
+    <div className="flex h-10 items-center overflow-hidden whitespace-nowrap rounded-full border-2 border-line bg-white text-sm font-semibold text-navy">
       <button onClick={onCityClick} className="flex h-full items-center gap-1.5 bg-line px-3.5" aria-label={`Change city, current city ${getCityName(city)}`}>
         <MapPin className="h-[18px] w-[18px]" aria-hidden />
         {getCityName(city)}
@@ -24,11 +24,13 @@ function DesktopDateBar({ city, onCityClick }: { city: string; onCityClick: () =
       </button>
       <button onClick={openDates} className="flex h-full items-center gap-1.5 px-3 hover:bg-page">
         <CalendarClock className="h-4 w-4" aria-hidden />
-        {dates ? `Delivery Date: ${formatShortDate(dates.from)}` : "Delivery Date"}
+        <span className="hidden xl:inline">Delivery Date{dates && ":"}</span>
+        {dates ? formatShortDate(dates.from) : <span className="xl:hidden">Delivery</span>}
       </button>
       <button onClick={openDates} className="flex h-full items-center gap-1.5 px-3 hover:bg-page">
         <CalendarClock className="h-4 w-4" aria-hidden />
-        {dates ? `Pickup Date: ${formatShortDate(dates.to)}` : "Pickup Date"}
+        <span className="hidden xl:inline">Pickup Date{dates && ":"}</span>
+        {dates ? formatShortDate(dates.to) : <span className="xl:hidden">Pickup</span>}
       </button>
       <button onClick={openDates} className="flex h-full items-center gap-1.5 rounded-full bg-navy px-3.5 text-white hover:bg-navy-light">
         <CalendarClock className="h-4 w-4" aria-hidden />
@@ -86,7 +88,7 @@ export default function Header({ city }: { city: string }) {
           </div>
 
           {/* Desktop actions */}
-          <div className="hidden items-center gap-6 text-white lg:flex">
+          <div className="hidden items-center gap-4 text-white lg:flex xl:gap-6">
             <button onClick={() => (isSearchOpen ? setSearchOpen(false) : openSearch())} aria-label="Search" aria-expanded={isSearchOpen}>
               <Search className="h-7 w-7" />
             </button>
@@ -98,11 +100,11 @@ export default function Header({ city }: { city: string }) {
                 </span>
               )}
             </button>
-            <button onClick={login} className="flex items-center gap-3">
+            <button onClick={login} className="flex items-center gap-3" aria-label="Login">
               <span className="grid h-[42px] w-[42px] place-items-center rounded-full border-2 border-white bg-white text-purple">
                 <UserRound className="h-6 w-6" aria-hidden />
               </span>
-              <span className="font-semibold">Hi, Login</span>
+              <span className="hidden whitespace-nowrap font-semibold xl:inline">Hi, Login</span>
             </button>
           </div>
 

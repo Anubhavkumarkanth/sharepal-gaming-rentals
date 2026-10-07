@@ -11,7 +11,7 @@ export default function FloatingActions() {
   const { dates, setDatePickerOpen } = useStore();
 
   return (
-    <>
+    <aside aria-label="Quick actions">
       {!dates && (
         <button
           onClick={() => setDatePickerOpen(true)}
@@ -25,6 +25,6 @@ export default function FloatingActions() {
         {/* eslint-disable-next-line @next/next/no-img-element -- small static SVG */}
         <img src={asset("/chat.svg")} alt="" width={112} height={112} className="h-16 w-16 lg:h-[72px] lg:w-[72px]" />
       </a>
-    </>
+    </aside>
   );
 }

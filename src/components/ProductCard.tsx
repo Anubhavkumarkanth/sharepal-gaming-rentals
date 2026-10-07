@@ -7,7 +7,7 @@ import { isVoteToLaunch, type Product } from "@/lib/products";
 import { formatPrice } from "@/lib/format";
 
 const TAG_COLORS: Record<string, string> = {
-  Trending: "border-orange text-orange",
+  Trending: "border-orange text-orange-dark",
   New: "border-sky text-sky",
   "Vote to Launch": "border-violet text-violet",
 };

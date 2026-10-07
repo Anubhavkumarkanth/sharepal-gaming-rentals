@@ -170,7 +170,7 @@ export default function DatePicker() {
                 <p>Chargeable Period:</p>
                 <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold">
                   <CalendarClock className="h-4 w-4" aria-hidden />
-                  {from && to ? `${formatShortDate(addDays(from, 1))} - ${formatShortDate(addDays(to, -1))}` : "--"}
+                  {!from || !to ? "--" : days === 1 ? formatShortDate(addDays(from, 1)) : `${formatShortDate(addDays(from, 1))} - ${formatShortDate(addDays(to, -1))}`}
                 </p>
               </div>
             </div>

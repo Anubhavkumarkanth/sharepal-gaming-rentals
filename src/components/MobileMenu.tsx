@@ -16,7 +16,7 @@ export default function MobileMenu({ city, isOpen, onClose, onChangeCity }: Prop
       className="m-0 h-dvh max-h-none w-[300px] max-w-[85vw] bg-white p-0"
     >
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
-        <Logo className="h-9 rounded-lg px-3 text-lg" />
+        <Logo className="h-9 w-[110px] items-center rounded-lg px-2.5" />
         <button onClick={onClose} className="rounded p-1 text-muted hover:text-ink" aria-label="Close menu">
           <X className="h-5 w-5" />
         </button>
@@ -32,7 +32,7 @@ export default function MobileMenu({ city, isOpen, onClose, onChangeCity }: Prop
       <nav aria-label="Categories" className="py-2">
         {CATEGORY_TABS.map(({ label, slug }) =>
           slug === CATEGORY_SLUG ? (
-            <a key={slug} href="#products" onClick={onClose} className="block border-l-4 border-purple-light bg-page px-4 py-3 text-sm font-medium text-purple">
+            <a key={slug} href="#products" onClick={onClose} className="block border-l-4 border-violet bg-page px-4 py-3 text-sm font-medium text-purple">
               {label}
             </a>
           ) : (
