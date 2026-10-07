@@ -54,7 +54,7 @@ function Month({ month, from, to, earliest, onSelect }: MonthProps) {
                   ? "rounded-md bg-brand font-semibold text-white"
                   : isInRange
                     ? "bg-brand-50 text-brand"
-                    : "rounded-md text-navy hover:bg-surface disabled:text-muted/40 disabled:hover:bg-transparent"
+                    : "rounded-md text-navy hover:bg-page disabled:text-muted/40 disabled:hover:bg-transparent"
               }`}
             >
               {day.getDate()}
@@ -166,7 +166,7 @@ export default function DatePicker() {
           <button
             onClick={apply}
             disabled={!from || !to}
-            className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-40"
+            className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-40"
           >
             Apply
           </button>

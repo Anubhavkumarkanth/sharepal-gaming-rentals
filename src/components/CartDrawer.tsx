@@ -45,7 +45,7 @@ export default function CartDrawer() {
             <ShoppingCart className="h-10 w-10 text-muted" aria-hidden />
             <p className="mt-3 font-semibold text-navy">Your cart is empty</p>
             <p className="mt-1 text-sm text-muted">Add a PS5 combo to get started.</p>
-            <button onClick={() => setCartOpen(false)} className="mt-4 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600">
+            <button onClick={() => setCartOpen(false)} className="mt-4 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
               Continue browsing
             </button>
           </div>
@@ -68,7 +68,7 @@ export default function CartDrawer() {
                           <Plus className="h-3.5 w-3.5" />
                         </button>
                       </div>
-                      <button onClick={() => updateQuantity(product.id, 0)} className="text-xs font-medium text-muted hover:text-carmine">
+                      <button onClick={() => updateQuantity(product.id, 0)} className="text-xs font-medium text-muted hover:text-danger">
                         Remove
                       </button>
                     </div>
@@ -109,7 +109,7 @@ export default function CartDrawer() {
               {amountForFreeDelivery !== null && amountForFreeDelivery > 0 && (
                 <p className="mt-2 text-xs text-muted">Add {formatPrice(amountForFreeDelivery)} more for free delivery.</p>
               )}
-              <button onClick={checkout} className="mt-4 h-11 w-full rounded-lg bg-brand font-semibold text-white hover:bg-brand-600">
+              <button onClick={checkout} className="mt-4 h-11 w-full rounded-lg bg-brand font-semibold text-white hover:bg-brand-dark">
                 {dates ? "Proceed to Checkout" : "Select Dates to Continue"}
               </button>
             </div>

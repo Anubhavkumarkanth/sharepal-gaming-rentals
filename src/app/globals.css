@@ -1,21 +1,28 @@
 @import "tailwindcss";
 
+/* Colours sampled from sharepal.in */
 @theme {
-  --color-brand: #1e4fd8;
-  --color-brand-600: #1a43bb;
-  --color-brand-50: #eef3ff;
-  --color-navy: #030d31;
-  --color-accent: #ffc93c;
-  --color-carmine: #b34032;
+  --color-purple: #4d187c;
+  --color-purple-light: #7e37c1;
+  --color-brand: #1945e8;
+  --color-brand-dark: #1537c0;
+  --color-brand-50: #eef2ff;
+  --color-navy: #030d30;
+  --color-navy-light: #111f55;
+  --color-lime: #a3fd03;
+  --color-orange: #e5702a;
+  --color-sky: #2b88c8;
+  --color-ink: #080d19;
+  --color-body: #37393d;
+  --color-muted: #787a7b;
+  --color-line: #e5e7e9;
+  --color-page: #f3f5f7;
   --color-success: #138a52;
-  --color-ink: #161c2d;
-  --color-muted: #5b6478;
-  --color-line: #e6e9f0;
-  --color-surface: #f5f7fb;
+  --color-danger: #c0392b;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-ubuntu), ui-sans-serif, system-ui, sans-serif;
 
-  --shadow-card: 0 4px 16px rgb(3 13 49 / 0.08);
+  --shadow-card: 0 2px 12px rgb(8 13 25 / 0.06);
 }
 
 html {
@@ -23,7 +30,7 @@ html {
 }
 
 body {
-  background: #fff;
+  background: var(--color-page);
   color: var(--color-ink);
 }
 

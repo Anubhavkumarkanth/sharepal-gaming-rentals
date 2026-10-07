@@ -1,24 +1,3 @@
-import {
-  Bike,
-  Camera,
-  CarFront,
-  Disc3,
-  Dumbbell,
-  Gamepad,
-  Gamepad2,
-  Glasses,
-  Joystick,
-  Luggage,
-  Mountain,
-  Projector,
-  ShieldCheck,
-  Tent,
-  Truck,
-  Tv,
-  Wallet,
-  BadgeCheck,
-} from "lucide-react";
-
 // Page copy and link lists live here so components stay focused on layout.
 
 export const SITE_ORIGIN = "https://sharepal.in";
@@ -43,34 +22,25 @@ export const getCityName = (slug: string) => CITIES.find((c) => c.slug === slug)
 // Links to the rest of SharePal open the real site.
 export const sharepalUrl = (path: string) => `${SITE_ORIGIN}${path}`;
 
-export const TOP_CATEGORIES = [
-  { label: "Gaming", slug: "gaming-gadgets-on-rent", icon: Gamepad2 },
-  { label: "Cameras", slug: "photography-on-rent", icon: Camera },
-  { label: "Entertainment", slug: "entertainment-on-rent", icon: Tv },
-  { label: "Trekking", slug: "trekking-gear-on-rent", icon: Mountain },
-  { label: "Travel", slug: "travel-gear-on-rent", icon: Luggage },
-  { label: "Riding Gear", slug: "riding-gear-on-rent", icon: Bike },
-  { label: "Camping", slug: "camping-gear-on-rent", icon: Tent },
-  { label: "Fitness", slug: "fitness-on-rent", icon: Dumbbell },
+// Tabs under the header. Only Gaming is part of this project.
+export const CATEGORY_TABS = [
+  { label: "Photography", slug: "photography-on-rent" },
+  { label: "Gaming", slug: CATEGORY_SLUG },
+  { label: "Outdoor", slug: "outdoor-on-rent" },
+  { label: "Entertainment", slug: "entertainment-on-rent" },
 ];
 
-// Only PS5 consoles have data in this project; the other tiles go to SharePal.
-export const SUBCATEGORIES = [
-  { label: "PS5 Consoles", path: "gaming-gadgets/ps5-console-on-rent", icon: Gamepad2, current: true },
-  { label: "PS5 Games", path: "gaming-gadgets-on-rent/ps5-games-on-rent", icon: Disc3 },
-  { label: "Xbox", path: "gaming-gadgets/xbox-console-on-rent", icon: Joystick },
-  { label: "Controllers", path: "gaming-gadgets/gaming-controllers-on-rent", icon: Gamepad },
-  { label: "Big Screen Gaming", path: "gaming-gadgets-on-rent/big-screen-gaming", icon: Projector },
-  { label: "Racing Wheels", path: "gaming-gadgets/racing-wheel-on-rent", icon: CarFront },
-  { label: "VR Headsets", path: "gaming-gadgets/vr-on-rent", icon: Glasses },
-];
-
-export const TRUST_BADGES = [
-  { title: "Zero Deposit", body: "No security deposit", icon: ShieldCheck },
-  { title: "Free Delivery", body: "On orders above ₹1200", icon: Truck },
-  { title: "Excellent Quality", body: "Checked before every rental", icon: BadgeCheck },
-  { title: "Pay on Delivery", body: "Pay when it reaches you", icon: Wallet },
-];
+export const ASSET_PARTNER = {
+  href: "/earn-with-us",
+  earning: [
+    { title: "Monthly Earnings", body: "From rental assets" },
+    { title: "Upto ₹10,000", body: "Instant Wallet credits" },
+  ],
+  rental: [
+    { title: "10% Off", body: "Exclusive discount when you rent" },
+    { title: "Get 10% Cashback", body: "On every order" },
+  ],
+};
 
 export const HOW_IT_WORKS = [
   { title: "Select dates", body: "Pick your delivery and pickup dates. You pay rent only for those days." },

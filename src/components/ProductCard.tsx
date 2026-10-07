@@ -1,107 +1,94 @@
 "use client";
 
-import { Bell, Minus, Plus, Star } from "lucide-react";
+import { Bell, BellRing, Minus, Plus, Star, ThumbsUp } from "lucide-react";
 import ProductImage from "@/components/ProductImage";
 import { useStore } from "@/lib/store";
 import { isVoteToLaunch, type Product } from "@/lib/products";
 import { formatPrice } from "@/lib/format";
 
 const TAG_STYLES: Record<string, string> = {
-  Trending: "bg-carmine text-white",
-  New: "bg-success text-white",
-  "Vote to Launch": "bg-navy text-white",
+  Trending: "border-orange text-orange",
+  New: "border-sky text-sky",
+  "Vote to Launch": "border-purple-light text-purple-light",
 };
+
+const circleButton =
+  "grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-navy text-navy transition-colors hover:bg-navy hover:text-white disabled:border-line disabled:text-muted disabled:hover:bg-transparent";
 
 export default function ProductCard({ product, eager }: { product: Product; eager?: boolean }) {
   const { cart, addToCart, updateQuantity, rentalDays, votes, addVote, notifyList, toggleNotify } = useStore();
   const quantity = cart[product.id] ?? 0;
   const comingSoon = isVoteToLaunch(product);
   const hasVoted = votes.includes(product.id);
+  const isNotifying = notifyList.includes(product.id);
+
+  let priceLabel = "Rent per day";
+  let price = `${formatPrice(product.per_day_rent)}/day`;
+  if (comingSoon) priceLabel = "Expected rent";
+  else if (rentalDays) {
+    priceLabel = `Total for ${rentalDays} ${rentalDays === 1 ? "day" : "days"}`;
+    price = formatPrice(product.per_day_rent * rentalDays);
+  }
 
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-line bg-white transition-shadow hover:shadow-card">
-      <div className="relative">
+    <article className="group flex h-full flex-col">
+      <div className="relative overflow-hidden rounded-2xl bg-white shadow-card">
         <ProductImage
           src={product.image}
           alt={product.name}
           eager={eager}
-          className={`aspect-square w-full p-3 ${product.out_of_stock ? "opacity-50 grayscale" : ""}`}
+          className={`aspect-square w-full p-4 transition-transform duration-300 group-hover:scale-105 ${product.out_of_stock ? "opacity-40 grayscale" : ""}`}
         />
         {product.tag && (
-          <span className={`absolute left-2 top-2 rounded px-2 py-0.5 text-[11px] font-semibold ${TAG_STYLES[product.tag] ?? "bg-navy text-white"}`}>
+          <span className={`absolute left-3 top-3 rounded-md border bg-white px-2 py-0.5 text-xs font-medium sm:text-sm ${TAG_STYLES[product.tag] ?? "border-line text-body"}`}>
             {product.tag}
           </span>
         )}
         {product.out_of_stock && (
-          <span className="absolute bottom-2 left-2 rounded bg-white px-2 py-0.5 text-[11px] font-semibold text-carmine ring-1 ring-carmine/30">
-            Out of stock
-          </span>
+          <span className="absolute bottom-3 left-3 rounded-md bg-navy px-2 py-0.5 text-xs font-medium text-white">Out of stock</span>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-3 sm:p-4">
-        <h3 className="line-clamp-2 min-h-[2lh] text-sm font-semibold leading-snug text-navy sm:text-[15px]">{product.name}</h3>
-
-        <p className="mt-1.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
+      <div className="flex flex-1 flex-col px-1 pt-3">
+        <h3 className="line-clamp-2 min-h-[2lh] text-[15px] font-medium leading-snug text-ink sm:text-lg">{product.name}</h3>
+        <p className="mb-3 mt-1 flex items-center gap-1.5 text-xs text-muted sm:text-sm">
           {product.rating > 0 && (
-            <span className="inline-flex items-center gap-0.5 font-semibold text-navy">
-              <Star className="h-3.5 w-3.5 fill-accent text-accent" aria-hidden />
-              {product.rating}
-            </span>
+            <>
+              <Star className="h-3.5 w-3.5 fill-orange text-orange" aria-hidden />
+              <span className="font-medium text-body">{product.rating}</span>
+              <span aria-hidden>·</span>
+            </>
           )}
-          {comingSoon ? (
-            <span>{product.booked_count.toLocaleString("en-IN")} votes</span>
-          ) : (
-            <span>Booked {product.booked_count.toLocaleString("en-IN")} times</span>
-          )}
+          {comingSoon
+            ? `${product.booked_count.toLocaleString("en-IN")} votes`
+            : `${product.booked_count.toLocaleString("en-IN")} booked`}
         </p>
 
-        <div className="mt-auto pt-3">
-          <p>
-            <span className="text-lg font-bold text-navy">{formatPrice(product.per_day_rent)}</span>
-            <span className="text-xs text-muted"> /day</span>
-          </p>
-          {rentalDays && !comingSoon && !product.out_of_stock && (
-            <p className="text-xs text-muted">
-              {formatPrice(product.per_day_rent * rentalDays)} for {rentalDays} days
-            </p>
-          )}
-        </div>
+        <div className="mt-auto flex items-end justify-between gap-2 border-t border-line pt-3">
+          <div className="min-w-0">
+            <p className="text-xs text-muted sm:text-sm">{priceLabel}</p>
+            <p className="text-base font-bold text-ink sm:text-lg">{price}</p>
+          </div>
 
-        <div className="mt-3">
           {comingSoon ? (
-            <button
-              onClick={() => addVote(product.id)}
-              disabled={hasVoted}
-              className="h-10 w-full rounded-lg border border-navy text-sm font-semibold text-navy hover:bg-navy hover:text-white disabled:border-line disabled:bg-surface disabled:text-muted"
-            >
-              {hasVoted ? "Voted" : "Vote to Launch"}
+            <button onClick={() => addVote(product.id)} disabled={hasVoted} className={circleButton} aria-label={hasVoted ? "Voted" : `Vote to launch ${product.name}`}>
+              <ThumbsUp className="h-5 w-5" />
             </button>
           ) : product.out_of_stock ? (
-            <button
-              onClick={() => toggleNotify(product.id)}
-              aria-pressed={notifyList.includes(product.id)}
-              className="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-line text-sm font-semibold text-navy hover:border-navy"
-            >
-              <Bell className="h-4 w-4" aria-hidden />
-              {notifyList.includes(product.id) ? "Alert set" : "Notify me"}
+            <button onClick={() => toggleNotify(product.id)} aria-pressed={isNotifying} className={circleButton} aria-label={isNotifying ? "Cancel back-in-stock alert" : `Notify me when ${product.name} is back`}>
+              {isNotifying ? <BellRing className="h-5 w-5" /> : <Bell className="h-5 w-5" />}
             </button>
           ) : quantity === 0 ? (
-            <button
-              onClick={() => addToCart(product.id)}
-              className="h-10 w-full rounded-lg bg-brand text-sm font-semibold text-white hover:bg-brand-600"
-            >
-              Add to Cart
+            <button onClick={() => addToCart(product.id)} className={circleButton} aria-label={`Add ${product.name} to cart`}>
+              <Plus className="h-6 w-6" />
             </button>
           ) : (
-            <div className="flex h-10 items-center justify-between rounded-lg border border-brand text-brand">
-              <button onClick={() => updateQuantity(product.id, quantity - 1)} className="grid h-full w-10 place-items-center" aria-label={`Remove one ${product.name}`}>
+            <div className="flex h-12 shrink-0 items-center rounded-full bg-navy text-white" role="group" aria-label={`Quantity of ${product.name}`}>
+              <button onClick={() => updateQuantity(product.id, quantity - 1)} className="grid h-12 w-9 place-items-center" aria-label="Remove one">
                 <Minus className="h-4 w-4" />
               </button>
-              <span className="text-sm font-semibold" aria-live="polite">
-                {quantity} in cart
-              </span>
-              <button onClick={() => updateQuantity(product.id, quantity + 1)} className="grid h-full w-10 place-items-center" aria-label={`Add one more ${product.name}`}>
+              <span className="w-4 text-center text-sm font-bold" aria-live="polite">{quantity}</span>
+              <button onClick={() => updateQuantity(product.id, quantity + 1)} className="grid h-12 w-9 place-items-center" aria-label="Add one more">
                 <Plus className="h-4 w-4" />
               </button>
             </div>

@@ -16,7 +16,7 @@ export default function ProductImage({ src, alt, className = "", eager = false }
 
   if (failed) {
     return (
-      <div className={`flex items-center justify-center bg-surface text-muted ${className}`} role="img" aria-label={alt}>
+      <div className={`flex items-center justify-center bg-page text-muted ${className}`} role="img" aria-label={alt}>
         <ImageOff className="h-6 w-6" aria-hidden />
       </div>
     );
