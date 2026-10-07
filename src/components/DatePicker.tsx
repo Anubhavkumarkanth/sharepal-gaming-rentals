@@ -1,87 +1,64 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Truck, PackageCheck, X } from "lucide-react";
+import { useState } from "react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import Dialog from "@/components/Dialog";
 import { useStore } from "@/lib/store";
-import { addDays, longDate, rentalDays, sameDay, startOfDay } from "@/lib/format";
+import { addDays, daysBetween, formatDate, isSameDay } from "@/lib/format";
 
 const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-const PRESETS = [
-  { label: "1 day", days: 1 },
-  { label: "3 days", days: 3 },
-  { label: "1 week", days: 7 },
-  { label: "1 month", days: 30 },
-];
 
-function Month({
-  month,
-  from,
-  to,
-  hover,
-  min,
-  onPick,
-  onHover,
-}: {
+type MonthProps = {
   month: Date;
   from: Date | null;
   to: Date | null;
-  hover: Date | null;
-  min: Date;
-  onPick: (d: Date) => void;
-  onHover: (d: Date | null) => void;
-}) {
-  const first = new Date(month.getFullYear(), month.getMonth(), 1);
-  const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
-  const cells: (Date | null)[] = [
-    ...Array.from({ length: first.getDay() }, () => null),
-    ...Array.from({ length: daysInMonth }, (_, i) => new Date(month.getFullYear(), month.getMonth(), i + 1)),
-  ];
-  const end = to ?? (from && hover && hover > from ? hover : null);
+  earliest: Date;
+  onSelect: (day: Date) => void;
+};
+
+function Month({ month, from, to, earliest, onSelect }: MonthProps) {
+  const year = month.getFullYear();
+  const monthIndex = month.getMonth();
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const leadingBlanks = new Date(year, monthIndex, 1).getDay();
+  const days = Array.from({ length: daysInMonth }, (_, i) => new Date(year, monthIndex, i + 1));
 
   return (
-    <div className="w-full">
-      <p className="mb-3 text-center text-[15px] font-bold text-navy">
+    <div>
+      <p className="mb-2 text-center text-sm font-semibold text-navy">
         {month.toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
       </p>
-      <div className="grid grid-cols-7 text-center text-[11.5px] font-semibold text-muted">
+      <div className="grid grid-cols-7 text-center text-xs text-muted">
         {WEEKDAYS.map((d) => (
           <span key={d} className="py-1">
             {d}
           </span>
         ))}
       </div>
-      <div className="grid grid-cols-7" onMouseLeave={() => onHover(null)}>
-        {cells.map((d, i) => {
-          if (!d) return <span key={i} />;
-          const disabled = d < min;
-          const isStart = from && sameDay(d, from);
-          const isEnd = end && sameDay(d, end);
-          const inRange = from && end && d > from && d < end;
+      <div className="grid grid-cols-7">
+        {Array.from({ length: leadingBlanks }, (_, i) => (
+          <span key={`blank-${i}`} />
+        ))}
+        {days.map((day) => {
+          const isEndpoint = (from && isSameDay(day, from)) || (to && isSameDay(day, to));
+          const isInRange = from && to && day > from && day < to;
           return (
-            <div
-              key={i}
-              className={`relative py-0.5 ${inRange ? "bg-brand-50" : ""} ${isStart && end ? "rounded-l-full bg-brand-50" : ""} ${
-                isEnd && from ? "rounded-r-full bg-brand-50" : ""
+            <button
+              key={day.getDate()}
+              onClick={() => onSelect(day)}
+              disabled={day < earliest}
+              aria-label={day.toDateString()}
+              aria-pressed={Boolean(isEndpoint)}
+              className={`h-9 text-sm ${
+                isEndpoint
+                  ? "rounded-md bg-brand font-semibold text-white"
+                  : isInRange
+                    ? "bg-brand-50 text-brand"
+                    : "rounded-md text-navy hover:bg-surface disabled:text-muted/40 disabled:hover:bg-transparent"
               }`}
             >
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={() => onPick(d)}
-                onMouseEnter={() => onHover(d)}
-                aria-label={longDate(d)}
-                aria-pressed={!!(isStart || isEnd)}
-                className={`mx-auto grid h-9 w-9 place-items-center rounded-full text-[13.5px] font-medium transition ${
-                  isStart || isEnd
-                    ? "bg-brand font-bold text-white shadow-[0_4px_12px_rgb(30_79_216/0.35)]"
-                    : disabled
-                      ? "cursor-not-allowed text-muted/35 line-through"
-                      : "text-navy hover:bg-brand-100"
-                }`}
-              >
-                {d.getDate()}
-              </button>
-            </div>
+              {day.getDate()}
+            </button>
           );
         })}
       </div>
@@ -90,158 +67,111 @@ function Month({
 }
 
 export default function DatePicker() {
-  const { datesOpen, setDatesOpen, dates, setDates } = useStore();
-  // Earliest delivery is tomorrow — gear is packed and checked the day before.
-  const [min] = useState(() => addDays(startOfDay(new Date()), 1));
+  const { isDatePickerOpen, setDatePickerOpen, dates, setDates } = useStore();
+  // Earliest delivery date offered is tomorrow.
+  const [earliest] = useState(() => addDays(new Date(), 1));
   const [from, setFrom] = useState<Date | null>(null);
   const [to, setTo] = useState<Date | null>(null);
-  const [hover, setHover] = useState<Date | null>(null);
-  const [view, setView] = useState(() => new Date(min.getFullYear(), min.getMonth(), 1));
+  const [visibleMonth, setVisibleMonth] = useState(() => new Date(earliest.getFullYear(), earliest.getMonth(), 1));
 
-  // Sync the draft with the saved selection each time the sheet opens.
-  useEffect(() => {
-    if (!datesOpen) return;
-    /* eslint-disable react-hooks/set-state-in-effect -- reset the draft on open */
-    setFrom(dates?.from ?? null);
-    setTo(dates?.to ?? null);
-    const anchor = dates?.from ?? min;
-    setView(new Date(anchor.getFullYear(), anchor.getMonth(), 1));
-    /* eslint-enable react-hooks/set-state-in-effect */
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDatesOpen(false);
-    window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [datesOpen, dates, min, setDatesOpen]);
+  // Start from the saved dates each time the picker opens. Adjusting state during
+  // render (instead of in an effect) avoids a flash of the old selection.
+  const [wasOpen, setWasOpen] = useState(false);
+  if (isDatePickerOpen !== wasOpen) {
+    setWasOpen(isDatePickerOpen);
+    if (isDatePickerOpen) {
+      setFrom(dates?.from ?? null);
+      setTo(dates?.to ?? null);
+    }
+  }
 
-  if (!datesOpen) return null;
-
-  const pick = (d: Date) => {
-    if (!from || to || d <= from) {
-      setFrom(d);
+  // First click picks delivery, second click picks pickup. Clicking a day on or
+  // before the delivery date starts a new selection.
+  function selectDay(day: Date) {
+    if (!from || to || day <= from) {
+      setFrom(day);
       setTo(null);
     } else {
-      setTo(d);
+      setTo(day);
     }
-  };
-  const next = new Date(view.getFullYear(), view.getMonth() + 1, 1);
-  const canGoBack = view > new Date(min.getFullYear(), min.getMonth(), 1);
-  const days = from && to ? rentalDays(from, to) : null;
+  }
+
+  function apply() {
+    if (from && to) setDates({ from, to });
+    setDatePickerOpen(false);
+  }
+
+  const nextMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1);
+  const canGoBack = visibleMonth > new Date(earliest.getFullYear(), earliest.getMonth(), 1);
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-navy/50 backdrop-blur-[2px] animate-fade sm:items-center sm:p-4" onClick={() => setDatesOpen(false)}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="dates-title"
-        onClick={(e) => e.stopPropagation()}
-        className="max-h-[92dvh] w-full max-w-[760px] animate-hint overflow-y-auto rounded-t-3xl bg-white shadow-lift sm:rounded-3xl"
-      >
-        <div className="flex items-start justify-between border-b border-line px-5 py-4 sm:px-6">
-          <div>
-            <h2 id="dates-title" className="text-lg font-bold text-navy">
-              Select rental dates
-            </h2>
-            <p className="text-sm text-muted">{!from ? "Choose your delivery date" : !to ? "Now choose your pickup date" : "Looks good — apply to see totals"}</p>
-          </div>
-          <button onClick={() => setDatesOpen(false)} className="grid h-9 w-9 place-items-center rounded-full hover:bg-surface" aria-label="Close">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+    <Dialog
+      isOpen={isDatePickerOpen}
+      onClose={() => setDatePickerOpen(false)}
+      label="Select rental dates"
+      className="mx-auto mb-0 mt-auto w-full max-w-none rounded-t-xl p-0 sm:m-auto sm:w-[640px] sm:rounded-xl"
+    >
+      <div className="flex items-center justify-between border-b border-line px-5 py-4">
+        <h2 className="text-base font-bold text-navy">Select rental dates</h2>
+        <button onClick={() => setDatePickerOpen(false)} className="rounded p-1 text-muted hover:text-ink" aria-label="Close">
+          <X className="h-5 w-5" />
+        </button>
+      </div>
 
-        <div className="grid grid-cols-2 gap-2 px-5 pt-4 sm:px-6">
-          {[
-            { label: "Delivery", value: from, Icon: Truck, active: !from },
-            { label: "Pickup", value: to, Icon: PackageCheck, active: !!from && !to },
-          ].map(({ label, value, Icon, active }) => (
-            <div key={label} className={`rounded-xl border-[1.5px] px-3 py-2 transition ${active ? "border-brand bg-brand-50/50" : "border-line"}`}>
-              <p className="flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-wide text-muted">
-                <Icon className="h-3.5 w-3.5" aria-hidden /> {label}
-              </p>
-              <p className="text-[15px] font-bold text-navy">{value ? longDate(value) : "—"}</p>
-            </div>
-          ))}
+      <div className="grid grid-cols-2 gap-3 px-5 pt-4 text-sm">
+        <div className={`rounded-lg border px-3 py-2 ${!from ? "border-brand" : "border-line"}`}>
+          <p className="text-xs text-muted">Delivery</p>
+          <p className="font-semibold text-navy">{from ? formatDate(from) : "Select date"}</p>
         </div>
-
-        <div className="flex flex-wrap gap-2 px-5 pt-3 sm:px-6">
-          {PRESETS.map((p) => (
-            <button
-              key={p.label}
-              onClick={() => {
-                const start = from ?? min;
-                setFrom(start);
-                setTo(addDays(start, p.days));
-              }}
-              className={`h-8 rounded-full border px-3 text-[12.5px] font-semibold transition ${
-                days === p.days ? "border-brand bg-brand text-white" : "border-line text-navy hover:border-brand/40"
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
+        <div className={`rounded-lg border px-3 py-2 ${from && !to ? "border-brand" : "border-line"}`}>
+          <p className="text-xs text-muted">Pickup</p>
+          <p className="font-semibold text-navy">{to ? formatDate(to) : "Select date"}</p>
         </div>
+      </div>
 
-        <div className="relative px-5 pb-2 pt-4 sm:px-6">
-          <button
-            onClick={() => setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))}
-            disabled={!canGoBack}
-            className="absolute left-4 top-3.5 grid h-8 w-8 place-items-center rounded-full hover:bg-surface disabled:opacity-30"
-            aria-label="Previous month"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => setView(next)}
-            className="absolute right-4 top-3.5 grid h-8 w-8 place-items-center rounded-full hover:bg-surface"
-            aria-label="Next month"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-          <div className="grid gap-8 sm:grid-cols-2">
-            <Month month={view} from={from} to={to} hover={hover} min={min} onPick={pick} onHover={setHover} />
-            <div className="hidden sm:block">
-              <Month month={next} from={from} to={to} hover={hover} min={min} onPick={pick} onHover={setHover} />
-            </div>
-          </div>
-        </div>
-
-        <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-line bg-white px-5 py-4 sm:px-6">
-          <div className="text-sm">
-            {days ? (
-              <>
-                <span className="text-lg font-extrabold text-navy">{days}</span> <span className="text-muted">day{days > 1 ? "s" : ""} rental</span>
-              </>
-            ) : (
-              <span className="text-muted">Pick two dates</span>
-            )}
-          </div>
-          <div className="flex gap-2">
-            {dates && (
-              <button
-                onClick={() => {
-                  setDates(null);
-                  setDatesOpen(false);
-                }}
-                className="h-11 rounded-xl px-4 text-sm font-semibold text-muted hover:bg-surface"
-              >
-                Clear
-              </button>
-            )}
-            <button
-              disabled={!from || !to}
-              onClick={() => {
-                if (from && to) setDates({ from, to });
-                setDatesOpen(false);
-              }}
-              className="h-11 rounded-xl bg-brand px-6 text-sm font-bold text-white transition hover:bg-brand-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Apply dates
-            </button>
+      <div className="relative px-5 py-4">
+        <button
+          onClick={() => setVisibleMonth(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() - 1, 1))}
+          disabled={!canGoBack}
+          className="absolute left-4 top-3.5 rounded p-1 text-navy disabled:opacity-30"
+          aria-label="Previous month"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <button onClick={() => setVisibleMonth(nextMonth)} className="absolute right-4 top-3.5 rounded p-1 text-navy" aria-label="Next month">
+          <ChevronRight className="h-5 w-5" />
+        </button>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Month month={visibleMonth} from={from} to={to} earliest={earliest} onSelect={selectDay} />
+          <div className="hidden sm:block">
+            <Month month={nextMonth} from={from} to={to} earliest={earliest} onSelect={selectDay} />
           </div>
         </div>
       </div>
-    </div>
+
+      <div className="flex items-center justify-between border-t border-line px-5 py-3">
+        <p className="text-sm text-muted">{from && to ? `${daysBetween(from, to)} days` : "Select delivery and pickup"}</p>
+        <div className="flex gap-2">
+          {dates && (
+            <button
+              onClick={() => {
+                setDates(null);
+                setDatePickerOpen(false);
+              }}
+              className="rounded-lg px-3 py-2 text-sm font-medium text-muted hover:text-ink"
+            >
+              Clear
+            </button>
+          )}
+          <button
+            onClick={apply}
+            disabled={!from || !to}
+            className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-40"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+    </Dialog>
   );
 }

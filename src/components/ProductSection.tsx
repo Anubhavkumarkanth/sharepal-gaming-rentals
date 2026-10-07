@@ -1,183 +1,122 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState } from "react";
-import { ArrowUpRight, CalendarDays, CarFront, Check, Disc3, Gamepad, Gamepad2, Glasses, Joystick, Projector, SearchX, SlidersHorizontal } from "lucide-react";
+import { useState } from "react";
+import { CalendarDays } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import Reveal from "@/components/Reveal";
 import { useStore } from "@/lib/store";
-import { PRODUCTS, applyFilters, sortProducts } from "@/lib/products";
-import { QUICK_FILTERS, SORT_OPTIONS, SUBCATEGORIES, cityName, sharepalUrl, type QuickFilterId, type SortValue } from "@/config/site";
-import { shortDate } from "@/lib/format";
-
-const SUB_ICONS = {
-  ps5: Gamepad2,
-  disc: Disc3,
-  xbox: Joystick,
-  gamepad: Gamepad,
-  projector: Projector,
-  wheel: CarFront,
-  vr: Glasses,
-} as const;
+import { FILTERS, SORT_OPTIONS, filterProducts, products, sortProducts, type SortOption } from "@/lib/products";
+import { formatDate } from "@/lib/format";
+import { SUBCATEGORIES, getCityName, sharepalUrl } from "@/config/site";
 
 export default function ProductSection({ city }: { city: string }) {
-  const { query, setQuery, dates, days, setDatesOpen } = useStore();
-  const [sort, setSort] = useState<SortValue>("recommended");
-  const [filters, setFilters] = useState<QuickFilterId[]>([]);
-  const deferredQuery = useDeferredValue(query);
+  const { search, setSearch, dates, rentalDays, setDatePickerOpen } = useStore();
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [sort, setSort] = useState<SortOption>("relevance");
 
-  const visible = useMemo(
-    () => sortProducts(applyFilters(PRODUCTS, filters, deferredQuery), sort),
-    [filters, deferredQuery, sort],
-  );
+  const visibleProducts = sortProducts(filterProducts(products, activeFilters, search), sort);
 
-  const toggle = (id: QuickFilterId) =>
-    setFilters((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]));
-  const reset = () => {
-    setFilters([]);
-    setQuery("");
-    setSort("recommended");
-  };
-  const name = cityName(city);
+  function toggleFilter(id: string) {
+    setActiveFilters((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
+  }
+
+  function clearAll() {
+    setActiveFilters([]);
+    setSearch("");
+  }
 
   return (
-    <section id="products" className="mx-auto max-w-7xl scroll-mt-40 px-4 pt-10 lg:px-6">
-      {/* Subcategories */}
-      <Reveal>
-        <h2 className="text-xl font-extrabold tracking-tight text-navy sm:text-2xl">Shop by category</h2>
-      </Reveal>
-      <ul className="no-scrollbar -mx-4 mt-4 flex gap-3 overflow-x-auto px-4 pb-1 lg:mx-0 lg:grid lg:grid-cols-7 lg:px-0">
-        {SUBCATEGORIES.map((s, i) => {
-          const Icon = SUB_ICONS[s.icon];
-          const active = "active" in s && s.active;
-          const body = (
-            <>
-              <span
-                className={`grid h-14 w-14 place-items-center rounded-2xl transition duration-300 group-hover:-translate-y-1 group-hover:rotate-[-4deg] ${
-                  active ? "bg-brand text-white shadow-[0_8px_20px_rgb(30_79_216/0.35)]" : "bg-brand-50 text-brand"
-                }`}
-              >
-                <Icon className="h-7 w-7" aria-hidden />
-              </span>
-              <span className={`flex items-center gap-0.5 text-center text-[12.5px] font-semibold leading-tight ${active ? "text-brand" : "text-navy"}`}>
-                {s.label}
-                {!active && <ArrowUpRight className="h-3 w-3 opacity-0 transition group-hover:opacity-60" aria-hidden />}
-              </span>
-            </>
-          );
-          const cls = `group flex w-[104px] shrink-0 flex-col items-center gap-2 rounded-2xl border px-2 py-4 transition lg:w-auto ${
-            active ? "border-brand/30 bg-brand-50/60" : "border-line bg-white hover:border-brand/25 hover:shadow-card"
-          }`;
-          return (
-            <Reveal as="li" key={s.label} delay={i * 50}>
-              {active ? (
-                <a href="#product-grid" className={cls} aria-current="true">
-                  {body}
-                </a>
-              ) : (
-                <a href={sharepalUrl(`/${city}/${s.path}`)} target="_blank" rel="noopener noreferrer" className={cls}>
-                  {body}
-                </a>
-              )}
-            </Reveal>
-          );
-        })}
+    <section id="products" className="mx-auto max-w-7xl scroll-mt-36 px-4 pt-8 lg:px-6">
+      <h2 className="text-lg font-bold text-navy">Browse by category</h2>
+      <ul className="no-scrollbar -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 lg:mx-0 lg:grid lg:grid-cols-7 lg:px-0">
+        {SUBCATEGORIES.map(({ label, path, icon: Icon, current }) => (
+          <li key={label} className="shrink-0">
+            <a
+              href={current ? "#product-list" : sharepalUrl(`/${city}/${path}`)}
+              aria-current={current ? "true" : undefined}
+              className={`flex w-24 flex-col items-center gap-2 rounded-xl border px-2 py-3 text-center text-xs font-medium lg:w-auto ${
+                current ? "border-brand bg-brand-50 text-brand" : "border-line text-navy hover:border-brand"
+              }`}
+            >
+              <Icon className="h-7 w-7" aria-hidden />
+              {label}
+            </a>
+          </li>
+        ))}
       </ul>
 
-      {/* Title + controls */}
-      <div className="mt-10 flex flex-wrap items-end justify-between gap-3">
+      <div id="product-list" className="mt-8 flex scroll-mt-36 flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-xl font-extrabold tracking-tight text-navy sm:text-2xl">PS5 Consoles on rent in {name}</h2>
-          <p className="mt-1 text-sm text-muted" aria-live="polite">
-            Showing <span className="font-semibold text-navy">{visible.length}</span> of {PRODUCTS.length} products
-            {query && (
-              <>
-                {" "}for “<span className="font-semibold text-navy">{query}</span>”
-              </>
-            )}
+          <h2 className="text-lg font-bold text-navy sm:text-xl">PS5 Consoles on Rent in {getCityName(city)}</h2>
+          <p className="text-sm text-muted" aria-live="polite">
+            {visibleProducts.length} {visibleProducts.length === 1 ? "product" : "products"}
+            {search && ` for “${search}”`}
           </p>
         </div>
         <label className="flex items-center gap-2 text-sm text-muted">
-          <SlidersHorizontal className="h-4 w-4" aria-hidden />
-          <span className="sr-only sm:not-sr-only">Sort by</span>
+          Sort by
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value as SortValue)}
-            className="h-10 cursor-pointer rounded-xl border border-line bg-white px-3 pr-8 text-sm font-semibold text-navy outline-none transition focus:border-brand"
+            onChange={(e) => setSort(e.target.value as SortOption)}
+            className="h-9 rounded-lg border border-line bg-white px-2 text-sm font-medium text-navy"
           >
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
+            {SORT_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
               </option>
             ))}
           </select>
         </label>
       </div>
 
-      <div className="no-scrollbar -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-wrap lg:px-0" role="group" aria-label="Filters">
-        {QUICK_FILTERS.map((f) => {
-          const on = filters.includes(f.id);
+      <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0" role="group" aria-label="Filters">
+        {FILTERS.map((filter) => {
+          const isActive = activeFilters.includes(filter.id);
           return (
             <button
-              key={f.id}
-              onClick={() => toggle(f.id)}
-              aria-pressed={on}
-              className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-semibold transition active:scale-95 ${
-                on ? "border-brand bg-brand text-white" : "border-line bg-white text-navy hover:border-brand/40"
+              key={filter.id}
+              onClick={() => toggleFilter(filter.id)}
+              aria-pressed={isActive}
+              className={`h-8 shrink-0 rounded-full border px-3 text-xs font-medium ${
+                isActive ? "border-brand bg-brand text-white" : "border-line bg-white text-navy hover:border-brand"
               }`}
             >
-              {on && <Check className="h-3.5 w-3.5" aria-hidden />}
-              {f.label}
+              {filter.label}
             </button>
           );
         })}
-        {(filters.length > 0 || query) && (
-          <button onClick={reset} className="h-9 shrink-0 px-2 text-[13px] font-semibold text-brand underline-offset-2 hover:underline">
-            Clear all
+        {activeFilters.length > 0 && (
+          <button onClick={() => setActiveFilters([])} className="h-8 shrink-0 px-2 text-xs font-semibold text-brand">
+            Clear filters
           </button>
         )}
       </div>
 
-      {/* Date nudge: totals appear on every card once dates are picked */}
-      <div
-        className={`mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3 ${
-          dates ? "border-success/25 bg-success/5" : "border-accent/50 bg-accent-50"
-        }`}
-      >
-        <p className="flex items-center gap-2 text-sm text-navy">
-          <CalendarDays className={`h-5 w-5 shrink-0 ${dates ? "text-success" : "text-[#b78400]"}`} aria-hidden />
-          {dates ? (
-            <span>
-              Showing total rent for <b>{days} day{days === 1 ? "" : "s"}</b> · {shortDate(dates.from)} → {shortDate(dates.to)}
-            </span>
-          ) : (
-            <span>
-              <b>Pick your delivery &amp; pickup dates</b> to see the total rent on every product.
-            </span>
-          )}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line bg-surface px-4 py-3 text-sm text-navy">
+        <p className="flex items-center gap-2">
+          <CalendarDays className="h-4 w-4 shrink-0 text-brand" aria-hidden />
+          {dates
+            ? `Prices for ${rentalDays} days: ${formatDate(dates.from)} – ${formatDate(dates.to)}`
+            : "Select your rental dates to see the total rent for each product."}
         </p>
-        <button
-          onClick={() => setDatesOpen(true)}
-          className="h-9 rounded-lg bg-navy px-4 text-[13px] font-bold text-white transition hover:bg-navy-800 active:scale-95"
-        >
+        <button onClick={() => setDatePickerOpen(true)} className="font-semibold text-brand hover:underline">
           {dates ? "Change dates" : "Select dates"}
         </button>
       </div>
 
-      {visible.length > 0 ? (
-        <ul id="product-grid" className="mt-5 grid scroll-mt-40 grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {visible.map((p, i) => (
-            <Reveal as="li" key={p.id} delay={(i % 4) * 60}>
-              <ProductCard product={p} priority={i < 4} highlight={deferredQuery} />
-            </Reveal>
+      {visibleProducts.length > 0 ? (
+        <ul className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 lg:gap-4">
+          {visibleProducts.map((product, index) => (
+            <li key={product.id}>
+              <ProductCard product={product} eager={index < 4} />
+            </li>
           ))}
         </ul>
       ) : (
-        <div className="mt-5 flex flex-col items-center rounded-2xl border border-dashed border-line px-6 py-14 text-center">
-          <SearchX className="h-10 w-10 text-muted" aria-hidden />
-          <p className="mt-3 text-lg font-bold text-navy">No combos match these filters</p>
-          <p className="mt-1 max-w-sm text-sm text-muted">Try removing a filter or searching for something broader, like “PS5”.</p>
-          <button onClick={reset} className="mt-5 h-10 rounded-xl bg-brand px-5 text-sm font-bold text-white hover:bg-brand-600">
-            Reset filters
+        <div className="mt-4 rounded-xl border border-dashed border-line px-6 py-12 text-center">
+          <p className="font-semibold text-navy">No products match your search</p>
+          <p className="mt-1 text-sm text-muted">Try a different keyword or remove some filters.</p>
+          <button onClick={clearAll} className="mt-4 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600">
+            Clear search and filters
           </button>
         </div>
       )}

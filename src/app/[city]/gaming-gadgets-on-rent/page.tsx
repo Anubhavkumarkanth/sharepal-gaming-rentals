@@ -1,23 +1,22 @@
 import type { Metadata } from "next";
-import { CITIES, cityName } from "@/config/site";
 import CategoryPage from "@/components/CategoryPage";
+import { CITIES, getCityName } from "@/config/site";
 
+type Props = { params: Promise<{ city: string }> };
+
+// One static page per city. Any other city slug is a 404.
 export const dynamicParams = false;
 
 export function generateStaticParams() {
   return CITIES.map((c) => ({ city: c.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ city: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { city } = await params;
-  const name = cityName(city);
-  return {
-    title: `Rent Gaming Gadgets in ${name} | PS5 on Rent — SharePal (recreation)`,
-    description: `Rent PS5 combos in ${name} with zero deposit, free delivery above ₹1200 and pay on delivery.`,
-  };
+  return { title: `Gaming Gadgets on Rent in ${getCityName(city)} | SharePal (recreation)` };
 }
 
-export default async function Page({ params }: { params: Promise<{ city: string }> }) {
+export default async function Page({ params }: Props) {
   const { city } = await params;
   return <CategoryPage city={city} />;
 }

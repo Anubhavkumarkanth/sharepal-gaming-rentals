@@ -1,5 +1,4 @@
-import raw from "@/data/products.json";
-import type { QuickFilterId, SortValue } from "@/config/site";
+import data from "@/data/products.json";
 
 export type Product = {
   id: number;
@@ -12,68 +11,63 @@ export type Product = {
   out_of_stock: boolean;
 };
 
-export const PRODUCTS: Product[] = raw.products;
+export const products: Product[] = data.products;
 
-export const isVoteToLaunch = (p: Product) => p.tag.toLowerCase() === "vote to launch";
+export const isVoteToLaunch = (p: Product) => p.tag === "Vote to Launch";
 
-export function controllerCount(p: Product): number | null {
-  const m = p.name.match(/(\d+)\s*Controllers?/i);
-  return m ? Number(m[1]) : null;
+// The JSON has no structured attributes, so filters read them from the product name.
+function controllerCount(p: Product) {
+  const match = p.name.match(/(\d+) Controllers?/i);
+  return match ? Number(match[1]) : null;
 }
 
-export function includesGames(p: Product): boolean {
-  if (/no games included/i.test(p.name)) return false;
-  return /games|game\)|all in one|fc\d+|ea play/i.test(p.name);
+function hasGames(p: Product) {
+  if (/no games/i.test(p.name)) return false;
+  return /games|all in one|ea play|fc\d+/i.test(p.name);
 }
 
-const isFootball = (p: Product) => /\bFC\d+\b/i.test(p.name);
+export const FILTERS = [
+  { id: "in-stock", label: "In stock", test: (p: Product) => !p.out_of_stock },
+  { id: "with-games", label: "Games included", test: hasGames },
+  { id: "1-controller", label: "1 Controller", test: (p: Product) => controllerCount(p) === 1 },
+  { id: "2-controllers", label: "2 Controllers", test: (p: Product) => controllerCount(p) === 2 },
+  { id: "4-controllers", label: "4 Controllers", test: (p: Product) => controllerCount(p) === 4 },
+];
 
-function matchesFilter(p: Product, id: QuickFilterId): boolean {
-  switch (id) {
-    case "in-stock":
-      return !p.out_of_stock;
-    case "games":
-      return includesGames(p);
-    case "c1":
-      return controllerCount(p) === 1;
-    case "c2":
-      return controllerCount(p) === 2;
-    case "c4":
-      return controllerCount(p) === 4;
-    case "fc":
-      return isFootball(p);
-  }
+export const SORT_OPTIONS = [
+  { value: "relevance", label: "Relevance" },
+  { value: "popular", label: "Most booked" },
+  { value: "price-low", label: "Price: Low to High" },
+  { value: "price-high", label: "Price: High to Low" },
+  { value: "rating", label: "Rating" },
+] as const;
+
+export type SortOption = (typeof SORT_OPTIONS)[number]["value"];
+
+export function filterProducts(list: Product[], activeFilters: string[], search: string) {
+  const query = search.trim().toLowerCase();
+  const filters = FILTERS.filter((f) => activeFilters.includes(f.id));
+
+  // Controller counts are alternatives: "1 Controller" + "2 Controllers" shows both.
+  const controllerFilters = filters.filter((f) => f.id.includes("controller"));
+  const otherFilters = filters.filter((f) => !f.id.includes("controller"));
+
+  return list.filter(
+    (p) =>
+      p.name.toLowerCase().includes(query) &&
+      otherFilters.every((f) => f.test(p)) &&
+      (controllerFilters.length === 0 || controllerFilters.some((f) => f.test(p))),
+  );
 }
 
-// Controller filters are alternatives (OR); every other filter narrows (AND).
-export function applyFilters(products: Product[], active: QuickFilterId[], query: string): Product[] {
-  const controllerIds = active.filter((id) => id.startsWith("c"));
-  const otherIds = active.filter((id) => !id.startsWith("c"));
-  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-
-  return products.filter((p) => {
-    if (controllerIds.length && !controllerIds.some((id) => matchesFilter(p, id))) return false;
-    if (!otherIds.every((id) => matchesFilter(p, id))) return false;
-    const name = p.name.toLowerCase();
-    return terms.every((t) => name.includes(t));
-  });
+export function sortProducts(list: Product[], sort: SortOption) {
+  const sorted = [...list];
+  if (sort === "popular") sorted.sort((a, b) => b.booked_count - a.booked_count);
+  if (sort === "price-low") sorted.sort((a, b) => a.per_day_rent - b.per_day_rent);
+  if (sort === "price-high") sorted.sort((a, b) => b.per_day_rent - a.per_day_rent);
+  if (sort === "rating") sorted.sort((a, b) => b.rating - a.rating);
+  // Products that can't be rented right now go last, whatever the sort.
+  return sorted.sort((a, b) => rentableRank(a) - rentableRank(b));
 }
 
-export function sortProducts(products: Product[], sort: SortValue): Product[] {
-  const list = [...products];
-  // Out-of-stock items always sink to the bottom so the first screen is rentable.
-  const stock = (a: Product, b: Product) => Number(a.out_of_stock) - Number(b.out_of_stock);
-  switch (sort) {
-    case "popular":
-      return list.filter((p) => !isVoteToLaunch(p)).sort((a, b) => stock(a, b) || b.booked_count - a.booked_count)
-        .concat(list.filter(isVoteToLaunch));
-    case "price-asc":
-      return list.sort((a, b) => stock(a, b) || a.per_day_rent - b.per_day_rent);
-    case "price-desc":
-      return list.sort((a, b) => stock(a, b) || b.per_day_rent - a.per_day_rent);
-    case "rating":
-      return list.sort((a, b) => stock(a, b) || b.rating - a.rating);
-    default:
-      return list.sort(stock);
-  }
-}
+const rentableRank = (p: Product) => (p.out_of_stock ? 2 : isVoteToLaunch(p) ? 1 : 0);

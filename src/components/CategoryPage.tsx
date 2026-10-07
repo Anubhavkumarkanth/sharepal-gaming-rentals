@@ -1,29 +1,32 @@
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
+import CategoryNav from "@/components/CategoryNav";
+import PageIntro from "@/components/PageIntro";
 import ProductSection from "@/components/ProductSection";
-import { AboutRental, Faq, HowItWorks } from "@/components/InfoSections";
+import HowItWorks from "@/components/HowItWorks";
+import Faq from "@/components/Faq";
 import Footer from "@/components/Footer";
 import DatePicker from "@/components/DatePicker";
 import CartDrawer from "@/components/CartDrawer";
-import { BackToTop, MobileCartBar, Toast } from "@/components/Floating";
+import MobileCartBar from "@/components/MobileCartBar";
+import Toast from "@/components/Toast";
 import { StoreProvider } from "@/lib/store";
 
 export default function CategoryPage({ city }: { city: string }) {
   return (
     <StoreProvider>
       <Header city={city} />
+      <CategoryNav city={city} />
       <main>
-        <Hero city={city} />
+        <PageIntro city={city} />
         <ProductSection city={city} />
         <HowItWorks />
-        <AboutRental city={city} />
         <Faq />
       </main>
       <Footer city={city} />
+
       <DatePicker />
       <CartDrawer />
       <MobileCartBar />
-      <BackToTop />
       <Toast />
     </StoreProvider>
   );

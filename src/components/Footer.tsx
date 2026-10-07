@@ -1,44 +1,30 @@
-import { CITIES, FOOTER_LINKS, SITE, SUBCATEGORIES, sharepalUrl } from "@/config/site";
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import { CATEGORY_SLUG, CITIES, FOOTER_LINKS, SUBCATEGORIES, sharepalUrl } from "@/config/site";
 
 export default function Footer({ city }: { city: string }) {
-  const columns: { title: string; links: { label: string; href: string }[] }[] = [
-    { title: "Gaming", links: SUBCATEGORIES.map((s) => ({ label: s.label, href: sharepalUrl(`/${city}/${s.path}`) })) },
-    ...Object.entries(FOOTER_LINKS).map(([title, links]) => ({
-      title,
-      links: links.map((l) => ({ label: l.label, href: sharepalUrl(l.href) })),
-    })),
+  const columns = [
+    { title: "Gaming", links: SUBCATEGORIES.map((s) => ({ label: s.label, href: `/${city}/${s.path}` })) },
+    ...FOOTER_LINKS,
   ];
 
   return (
-    <footer className="mt-20 bg-navy pb-24 text-white/70 lg:pb-0">
-      <div className="mx-auto max-w-7xl px-4 py-12 lg:px-6">
-        <div className="grid gap-10 lg:grid-cols-[1.3fr_2fr]">
+    <footer className="mt-16 bg-navy text-sm text-white/70">
+      <div className="mx-auto max-w-7xl px-4 pb-24 pt-10 md:pb-10 lg:px-6">
+        <div className="grid gap-8 md:grid-cols-[1fr_2fr]">
           <div>
             <Logo inverted />
-            <p className="mt-4 max-w-sm text-[14px] leading-relaxed">
-              India&apos;s lifestyle gear rental platform. Rent gaming consoles, cameras, projectors, travel and trekking gear —
-              own less, live more.
-            </p>
-            <a
-              href={sharepalUrl(SITE.contactPath)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 inline-flex h-10 items-center rounded-xl bg-white/10 px-4 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15"
-            >
-              Contact support
-            </a>
+            <p className="mt-3 max-w-xs">Rent gaming consoles, cameras, travel gear and more, delivered to your doorstep.</p>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-            {columns.map((col) => (
-              <div key={col.title}>
-                <h3 className="text-sm font-bold text-white">{col.title}</h3>
-                <ul className="mt-3 space-y-2 text-[13.5px]">
-                  {col.links.map((l) => (
-                    <li key={l.label}>
-                      <a href={l.href} target="_blank" rel="noopener noreferrer" className="transition hover:text-accent">
-                        {l.label}
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+            {columns.map((column) => (
+              <div key={column.title}>
+                <h3 className="font-semibold text-white">{column.title}</h3>
+                <ul className="mt-3 space-y-2">
+                  {column.links.map((link) => (
+                    <li key={link.label}>
+                      <a href={sharepalUrl(link.href)} className="hover:text-white">
+                        {link.label}
                       </a>
                     </li>
                   ))}
@@ -48,23 +34,22 @@ export default function Footer({ city }: { city: string }) {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-6">
-          <h3 className="text-sm font-bold text-white">Gaming gadgets on rent near you</h3>
-          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-[13px]">
-            {CITIES.map((c) => (
+        <div className="mt-8 border-t border-white/10 pt-6">
+          <h3 className="font-semibold text-white">Gaming gadgets on rent in other cities</h3>
+          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
+            {CITIES.filter((c) => c.slug !== city).map((c) => (
               <li key={c.slug}>
-                <Link href={`/${c.slug}/${SITE.categorySlug}/`} className="transition hover:text-accent">
-                  PS5 on rent in {c.name}
+                <Link href={`/${c.slug}/${CATEGORY_SLUG}/`} className="hover:text-white">
+                  {c.name}
                 </Link>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="mt-8 flex flex-col gap-2 border-t border-white/10 pt-6 text-[12.5px] sm:flex-row sm:items-center sm:justify-between">
-          <p>© {SITE.name}. Product names, prices and images belong to their owners.</p>
-          <p>Front-end recreation built as a hiring assignment — not the official SharePal website.</p>
-        </div>
+        <p className="mt-8 border-t border-white/10 pt-6 text-xs">
+          Recreation of a SharePal page built for a frontend assignment. Not the official SharePal website.
+        </p>
       </div>
     </footer>
   );

@@ -1,45 +1,40 @@
 "use client";
 
-import { useState } from "react";
-import { Gamepad2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ImageOff } from "lucide-react";
 
-// Product shots come from SharePal's image CDN. If one fails, show a branded
-// placeholder instead of a broken-image icon.
-export default function ProductImage({
-  src,
-  alt,
-  className = "",
-  priority = false,
-}: {
-  src: string;
-  alt: string;
-  className?: string;
-  priority?: boolean;
-}) {
-  const [state, setState] = useState<"loading" | "ok" | "error">("loading");
+export default function ProductImage({ src, alt, className = "", eager = false }: { src: string; alt: string; className?: string; eager?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  if (state === "error") {
+  // The <img> is in the static HTML, so it can fail before React hydrates and
+  // attaches onError. Catch that case on mount.
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
+
+  if (failed) {
     return (
-      <div className={`grid place-items-center bg-gradient-to-br from-brand-50 to-surface ${className}`} role="img" aria-label={alt}>
-        <Gamepad2 className="h-1/3 w-1/3 text-brand/30" aria-hidden />
+      <div className={`flex items-center justify-center bg-surface text-muted ${className}`} role="img" aria-label={alt}>
+        <ImageOff className="h-6 w-6" aria-hidden />
       </div>
     );
   }
 
   return (
-    <div className={`relative ${className}`}>
-      {state === "loading" && <div className="skeleton absolute inset-0" aria-hidden />}
-      {/* eslint-disable-next-line @next/next/no-img-element -- remote CDN image on a static export */}
-      <img
-        src={src}
-        alt={alt}
-        loading={priority ? "eager" : "lazy"}
-        decoding="async"
-        fetchPriority={priority ? "high" : "auto"}
-        onLoad={() => setState("ok")}
-        onError={() => setState("error")}
-        className={`h-full w-full object-contain transition-opacity duration-500 ${state === "ok" ? "opacity-100" : "opacity-0"}`}
-      />
-    </div>
+    // Plain <img>: the site is a static export, so next/image can't resize images anyway.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={imgRef}
+      src={src}
+      alt={alt}
+      width={400}
+      height={400}
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      onError={() => setFailed(true)}
+      className={`object-contain ${className}`}
+    />
   );
 }

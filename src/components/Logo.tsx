@@ -1,7 +1,7 @@
-// Wordmark recreated in SVG/CSS so the page has no dependency on SharePal's asset host.
+// Simple SVG + text wordmark instead of copying SharePal's logo file.
 export default function Logo({ inverted = false }: { inverted?: boolean }) {
   return (
-    <span className="inline-flex items-center gap-1.5 select-none" aria-label="SharePal">
+    <span className="inline-flex items-center gap-1.5">
       <svg viewBox="0 0 32 32" className="h-7 w-7 shrink-0 sm:h-8 sm:w-8" aria-hidden>
         <rect width="32" height="32" rx="9" className={inverted ? "fill-white" : "fill-brand"} />
         <path
@@ -13,7 +13,7 @@ export default function Logo({ inverted = false }: { inverted?: boolean }) {
         />
         <circle cx="23.5" cy="8.5" r="2.2" className="fill-accent" />
       </svg>
-      <span className={`text-[19px] font-extrabold sm:text-[22px] tracking-tight ${inverted ? "text-white" : "text-navy"}`}>
+      <span className={`text-xl font-extrabold tracking-tight sm:text-[22px] ${inverted ? "text-white" : "text-navy"}`}>
         Share<span className={inverted ? "text-accent" : "text-brand"}>Pal</span>
       </span>
     </span>
