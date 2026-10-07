@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002F[city]\u002Fgaming-gadgets-on-rent"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()

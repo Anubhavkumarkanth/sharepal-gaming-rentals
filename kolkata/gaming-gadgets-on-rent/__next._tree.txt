@@ -1,0 +1,12 @@
+:HL["/sharepal-gaming-rentals/_next/static/chunks/43j6t-335lyaw.css","style"]
+:HL["/sharepal-gaming-rentals/_next/static/media/1bc7fc94203521e3-s.p.0gm5xa07u9y0b.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/sharepal-gaming-rentals/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["https://sharepal.in/_next/image?url=https%3A%2F%2Fimages.sharepal.in%2Fsuper-categories%2Fgaming-right.webp&w=256&q=75","image"]
+:HL["/sharepal-gaming-rentals/sharepal-logo.svg","image"]
+:HL["https://images.sharepal.in/super-categories-brand-logos/gaming/XBOX.svg","image"]
+:HL["https://images.sharepal.in/super-categories-brand-logos/gaming/PS5.svg","image"]
+:HL["https://images.sharepal.in/super-categories-brand-logos/gaming/Sony.svg","image"]
+3:[["children",{"s":"__PAGE__","h":160}]]
+2:[["children",{"s":"gaming-gadgets-on-rent","h":96,"c":"$Q3"}]]
+1:[["children",{"s":{"n":"city","t":"d","k":"kolkata","s":[]},"h":65632,"c":"$Q2"}]]
+0:{"b":"usZHJUW2HP3WyEpR3xRC3","t":{"t":{"s":"","h":131152,"c":"$Q1"}}}
