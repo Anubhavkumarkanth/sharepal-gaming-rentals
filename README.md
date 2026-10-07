@@ -3,6 +3,8 @@
 A recreation of SharePal's [Gaming Gadgets on Rent](https://sharepal.in/bangalore/gaming-gadgets-on-rent) page, built
 for a frontend assignment. The product listing is driven by the supplied `product-list.json`.
 
+**Live demo:** https://anubhavkumarkanth.github.io/sharepal-gaming-rentals/bangalore/gaming-gadgets-on-rent/
+
 ## Tech stack
 
 - Next.js 16 (App Router, static export)
